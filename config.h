@@ -91,6 +91,8 @@
 #    define RGB_MATRIX_VAL_STEP 8
 #    define RGB_MATRIX_SPD_STEP 10
 
+#define WPM_LAUNCH_CONTROL
+
 /* Disable the animations you don't want/need.  You will need to disable a good number of these    *
  * because they take up a lot of space.  Disable until you can successfully compile your firmware. */
  // #   undef ENABLE_RGB_MATRIX_ALPHAS_MODS
