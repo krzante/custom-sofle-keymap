@@ -353,20 +353,20 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
         render_anim();
-        oled_set_cursor(0, 0);                           // sets cursor to (row, column) using charactar spacing (5 rows on 128x32 screen, anything more will overflow back to the top)
+        oled_set_cursor(0, 0); // sets cursor to (row, column) using charactar spacing (5 rows on 128x32 screen, anything more will overflow back to the top)
         sprintf(wpm_str, "WPM:%03d", get_current_wpm()); // edit the string to change wwhat shows up, edit %03d to change how many digits show up
-        oled_write(wpm_str, false);                      // writes wpm on top left corner of string
+        oled_write(wpm_str, false); // writes wpm on top left corner of string
 
         oled_set_cursor(0, 1);
         switch (get_highest_layer(default_layer_state)) {
             case _QWERTY:
-                oled_write("QWRTY", false);
+                oled_write("QWERTY", false);
                 break;
             case _COLEMAK:
-                oled_write("CLMK", false);
+                oled_write("COLEMAK", false);
                 break;
             case _COLEMAKDH:
-                oled_write("CL", false);
+                oled_write("CLMK-DH", false);
                 break;
             default:
                 oled_write("Undef", false);
@@ -399,25 +399,33 @@ bool oled_task_user(void) {
 
 #endif
 
+void update_tri_layer_now(uint8_t layer1, uint8_t layer2, uint8_t layer3) {
+    if (IS_LAYER_ON(layer1) && IS_LAYER_ON(layer2)) {
+        layer_on(layer3);
+    } else {
+        layer_off(layer3);
+    }
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case KC_LOWER:
             if (record->event.pressed) {
                 layer_on(_LOWER);
-                update_tri_layer(_LOWER, _RAISE, _ADJUST);
             } else {
                 layer_off(_LOWER);
-                update_tri_layer(_LOWER, _RAISE, _ADJUST);
             }
+            // Update adjust layer
+            update_tri_layer_now(_LOWER, _RAISE, _ADJUST);
             return false;
         case KC_RAISE:
             if (record->event.pressed) {
                 layer_on(_RAISE);
-                update_tri_layer(_LOWER, _RAISE, _ADJUST);
             } else {
                 layer_off(_RAISE);
-                update_tri_layer(_LOWER, _RAISE, _ADJUST);
             }
+            // Update adjust layer
+            update_tri_layer_now(_LOWER, _RAISE, _ADJUST);
             return false;
         case KC_ADJUST:
             if (record->event.pressed) {
@@ -426,14 +434,55 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_off(_ADJUST);
             }
             return false;
-            break;
-            case KC_PRVWD:
+            case KC_PRVWD:  // Previous Word
             if (record->event.pressed) {
                 if (keymap_config.swap_lctl_lgui) {
-                    register_mods(mod_config(MOD_LALT));
+                    // For macOS when Ctrl and GUI are swapped
+                    register_mods(mod_config(MOD_LGUI));  // Command key
                     register_code(KC_LEFT);
                 } else {
-                    register_mods(mod_config(MOD_LCTL));
+                    // Standard macOS behavior
+                    register_mods(mod_config(MOD_LALT));  // Option key
+                    register_code(KC_LEFT);
+                }
+            } else {
+                if (keymap_config.swap_lctl_lgui) {
+                    unregister_mods(mod_config(MOD_LGUI));
+                    unregister_code(KC_LEFT);
+                } else {
+                    unregister_mods(mod_config(MOD_LALT));
+                    unregister_code(KC_LEFT);
+                }
+            }
+            break;
+        
+        case KC_NXTWD:  // Next Word
+            if (record->event.pressed) {
+                if (keymap_config.swap_lctl_lgui) {
+                    register_mods(mod_config(MOD_LGUI));  // Command key
+                    register_code(KC_RIGHT);
+                } else {
+                    register_mods(mod_config(MOD_LALT));  // Option key
+                    register_code(KC_RIGHT);
+                }
+            } else {
+                if (keymap_config.swap_lctl_lgui) {
+                    unregister_mods(mod_config(MOD_LGUI));
+                    unregister_code(KC_RIGHT);
+                } else {
+                    unregister_mods(mod_config(MOD_LALT));
+                    unregister_code(KC_RIGHT);
+                }
+            }
+            break;
+        
+        case KC_LSTRT:  // Line Start
+            if (record->event.pressed) {
+                if (keymap_config.swap_lctl_lgui) {
+                    register_mods(mod_config(MOD_LALT));  // Option key
+                    register_code(KC_LEFT);
+                } else {
+                    register_mods(mod_config(MOD_LGUI));  // Command key
                     register_code(KC_LEFT);
                 }
             } else {
@@ -441,18 +490,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     unregister_mods(mod_config(MOD_LALT));
                     unregister_code(KC_LEFT);
                 } else {
-                    unregister_mods(mod_config(MOD_LCTL));
+                    unregister_mods(mod_config(MOD_LGUI));
                     unregister_code(KC_LEFT);
                 }
             }
             break;
-        case KC_NXTWD:
+        
+        case KC_LEND:  // Line End
             if (record->event.pressed) {
                 if (keymap_config.swap_lctl_lgui) {
-                    register_mods(mod_config(MOD_LALT));
+                    register_mods(mod_config(MOD_LALT));  // Option key
                     register_code(KC_RIGHT);
                 } else {
-                    register_mods(mod_config(MOD_LCTL));
+                    register_mods(mod_config(MOD_LGUI));  // Command key
                     register_code(KC_RIGHT);
                 }
             } else {
@@ -460,42 +510,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     unregister_mods(mod_config(MOD_LALT));
                     unregister_code(KC_RIGHT);
                 } else {
-                    unregister_mods(mod_config(MOD_LCTL));
+                    unregister_mods(mod_config(MOD_LGUI));
                     unregister_code(KC_RIGHT);
-                }
-            }
-            break;
-        case KC_LSTRT:
-            if (record->event.pressed) {
-                if (keymap_config.swap_lctl_lgui) {
-                    register_mods(mod_config(MOD_LCTL));
-                    register_code(KC_LEFT);
-                } else {
-                    register_code(KC_HOME);
-                }
-            } else {
-                if (keymap_config.swap_lctl_lgui) {
-                    unregister_mods(mod_config(MOD_LCTL));
-                    unregister_code(KC_LEFT);
-                } else {
-                    unregister_code(KC_HOME);
-                }
-            }
-            break;
-        case KC_LEND:
-            if (record->event.pressed) {
-                if (keymap_config.swap_lctl_lgui) {
-                    register_mods(mod_config(MOD_LCTL));
-                    register_code(KC_RIGHT);
-                } else {
-                    register_code(KC_END);
-                }
-            } else {
-                if (keymap_config.swap_lctl_lgui) {
-                    unregister_mods(mod_config(MOD_LCTL));
-                    unregister_code(KC_RIGHT);
-                } else {
-                    unregister_code(KC_END);
                 }
             }
             break;
