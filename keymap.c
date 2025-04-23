@@ -266,6 +266,15 @@ uint8_t  current_idle_frame = 0;
 // uint8_t current_prep_frame = 0; // uncomment if PREP_FRAMES >1
 uint8_t current_tap_frame = 0;
 
+#define TAP_SPEED_STAGE1  50
+#define TAP_SPEED_STAGE2 70
+#define TAP_SPEED_STAGE3 100
+
+#define TAP_ANIM_DURATION_STAGE1 200
+#define TAP_ANIM_DURATION_STAGE2 120
+#define TAP_ANIM_DURATION_STAGE3  60
+
+
 // Code containing pixel art, contains:
 // 5 idle frames, 1 prep frame, and 2 tap frames
 
@@ -298,24 +307,47 @@ static void render_anim(void) {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x80, 0x80, 0x80, 0x40, 0x40, 0x40, 0x40, 0x20, 0x20, 0x20, 0x20, 0x10, 0x10, 0x10, 0x10, 0x08, 0x0f, 0x08, 0x08, 0x04, 0x04, 0x04, 0x04, 0x02, 0x02, 0x02, 0x02, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x0f, 0x0f, 0x07, 0x03, 0x03, 0x61, 0xf0, 0xf8, 0xfc, 0x60, 0x01, 0x01, 0x01, 0x3c, 0x78, 0xf8, 0xf0, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
     };
 
+    uint16_t anim_frame_duration = ANIM_FRAME_DURATION; // fallback
+    uint8_t wpm = get_current_wpm();
+
+    if (wpm >= TAP_SPEED_STAGE3) {
+        anim_frame_duration = TAP_ANIM_DURATION_STAGE3;
+    } else if (wpm >= TAP_SPEED_STAGE2) {
+        anim_frame_duration = TAP_ANIM_DURATION_STAGE2;
+    } else if (wpm >= TAP_SPEED_STAGE1) {
+        anim_frame_duration = TAP_ANIM_DURATION_STAGE1;
+    }
+
     // assumes 1 frame prep stage
+    // void animation_phase(void) {
+    //     if (get_current_wpm() <= IDLE_SPEED) {
+    //         current_idle_frame = (current_idle_frame + 1) % IDLE_FRAMES;
+    //         oled_write_raw_P(idle[abs((IDLE_FRAMES - 1) - current_idle_frame)], ANIM_SIZE);
+    //     }
+    //     if (get_current_wpm() > IDLE_SPEED && get_current_wpm() < TAP_SPEED) {
+    //         // oled_write_raw_P(prep[abs((PREP_FRAMES-1)-current_prep_frame)], ANIM_SIZE); // uncomment if IDLE_FRAMES >1
+    //         oled_write_raw_P(prep[0], ANIM_SIZE); // remove if IDLE_FRAMES >1
+    //     }
+    //     if (get_current_wpm() >= TAP_SPEED) {
+    //         current_tap_frame = (current_tap_frame + 1) % TAP_FRAMES;
+    //         oled_write_raw_P(tap[abs((TAP_FRAMES - 1) - current_tap_frame)], ANIM_SIZE);
+    //     }
+    // }
     void animation_phase(void) {
-        if (get_current_wpm() <= IDLE_SPEED) {
+        if (wpm <= IDLE_SPEED) {
             current_idle_frame = (current_idle_frame + 1) % IDLE_FRAMES;
             oled_write_raw_P(idle[abs((IDLE_FRAMES - 1) - current_idle_frame)], ANIM_SIZE);
-        }
-        if (get_current_wpm() > IDLE_SPEED && get_current_wpm() < TAP_SPEED) {
-            // oled_write_raw_P(prep[abs((PREP_FRAMES-1)-current_prep_frame)], ANIM_SIZE); // uncomment if IDLE_FRAMES >1
-            oled_write_raw_P(prep[0], ANIM_SIZE); // remove if IDLE_FRAMES >1
-        }
-        if (get_current_wpm() >= TAP_SPEED) {
+        } else if (wpm > IDLE_SPEED && wpm < TAP_SPEED) {
+            oled_write_raw_P(prep[0], ANIM_SIZE);
+        } else if (wpm >= TAP_SPEED) {
             current_tap_frame = (current_tap_frame + 1) % TAP_FRAMES;
             oled_write_raw_P(tap[abs((TAP_FRAMES - 1) - current_tap_frame)], ANIM_SIZE);
         }
     }
-    if (get_current_wpm() != 000) {
-        oled_on(); // not essential but turns on animation OLED with any alpha keypress
-        if (timer_elapsed32(anim_timer) > ANIM_FRAME_DURATION) {
+
+    if (wpm != 0) {
+        oled_on();
+        if (timer_elapsed32(anim_timer) > anim_frame_duration) { // ⏱️ Use dynamic timing
             anim_timer = timer_read32();
             animation_phase();
         }
@@ -324,7 +356,7 @@ static void render_anim(void) {
         if (timer_elapsed32(anim_sleep) > OLED_TIMEOUT) {
             oled_off();
         } else {
-            if (timer_elapsed32(anim_timer) > ANIM_FRAME_DURATION) {
+            if (timer_elapsed32(anim_timer) > anim_frame_duration) {
                 anim_timer = timer_read32();
                 animation_phase();
             }
@@ -393,7 +425,7 @@ bool oled_task_user(void) {
         }
 
         // Add Caps Lock indicator on row 3
-        oled_set_cursor(0, 4);
+        oled_set_cursor(0, 3);
         if (host_keyboard_led_state().caps_lock) {
             oled_write("CAPS", false);
         } else {
@@ -486,43 +518,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         
         case KC_LSTRT:  // Line Start
             if (record->event.pressed) {
-                if (keymap_config.swap_lctl_lgui) {
-                    register_mods(mod_config(MOD_LGUI));  // Command key
-                    register_code(KC_LEFT);
-                } else {
-                    register_mods(mod_config(MOD_LALT));  // Option key
-                    register_code(KC_LEFT);
-                }
+                register_code(KC_HOME);
             } else {
-                if (keymap_config.swap_lctl_lgui) {
-                    unregister_mods(mod_config(MOD_LGUI));
-                    unregister_code(KC_LEFT);
-                } else {
-                    unregister_mods(mod_config(MOD_LALT));
-                    unregister_code(KC_LEFT);
-                }
+                unregister_code(KC_HOME);
             }
             break;
         
         case KC_LEND:  // Line End
             if (record->event.pressed) {
-                if (keymap_config.swap_lctl_lgui) {
-                    register_mods(mod_config(MOD_LGUI));  // Command key
-                    register_code(KC_RIGHT);
-                } else {
-                    register_mods(mod_config(MOD_LALT));  // Option key
-                    register_code(KC_RIGHT);
-                }
+                register_code(KC_END);
             } else {
-                if (keymap_config.swap_lctl_lgui) {
-                    unregister_mods(mod_config(MOD_LGUI));
-                    unregister_code(KC_RIGHT);
-                } else {
-                    unregister_mods(mod_config(MOD_LALT));
-                    unregister_code(KC_RIGHT);
-                }
+                unregister_code(KC_END);
             }
-            break;
+            break;        
     }
     return true;
 }
