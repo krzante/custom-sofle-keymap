@@ -391,6 +391,14 @@ bool oled_task_user(void) {
             default:
                 oled_write("Undef", false);
         }
+
+        // Add Caps Lock indicator on row 3
+        oled_set_cursor(0, 4);
+        if (host_keyboard_led_state().caps_lock) {
+            oled_write("CAPS", false);
+        } else {
+            oled_write("    ", false); // Clear the space if not active
+        }
     } else {
         render_logo();
     }
@@ -479,18 +487,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case KC_LSTRT:  // Line Start
             if (record->event.pressed) {
                 if (keymap_config.swap_lctl_lgui) {
-                    register_mods(mod_config(MOD_LALT));  // Option key
+                    register_mods(mod_config(MOD_LGUI));  // Command key
                     register_code(KC_LEFT);
                 } else {
-                    register_mods(mod_config(MOD_LGUI));  // Command key
+                    register_mods(mod_config(MOD_LALT));  // Option key
                     register_code(KC_LEFT);
                 }
             } else {
                 if (keymap_config.swap_lctl_lgui) {
-                    unregister_mods(mod_config(MOD_LALT));
+                    unregister_mods(mod_config(MOD_LGUI));
                     unregister_code(KC_LEFT);
                 } else {
-                    unregister_mods(mod_config(MOD_LGUI));
+                    unregister_mods(mod_config(MOD_LALT));
                     unregister_code(KC_LEFT);
                 }
             }
@@ -499,18 +507,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case KC_LEND:  // Line End
             if (record->event.pressed) {
                 if (keymap_config.swap_lctl_lgui) {
-                    register_mods(mod_config(MOD_LALT));  // Option key
+                    register_mods(mod_config(MOD_LGUI));  // Command key
                     register_code(KC_RIGHT);
                 } else {
-                    register_mods(mod_config(MOD_LGUI));  // Command key
+                    register_mods(mod_config(MOD_LALT));  // Option key
                     register_code(KC_RIGHT);
                 }
             } else {
                 if (keymap_config.swap_lctl_lgui) {
-                    unregister_mods(mod_config(MOD_LALT));
+                    unregister_mods(mod_config(MOD_LGUI));
                     unregister_code(KC_RIGHT);
                 } else {
-                    unregister_mods(mod_config(MOD_LGUI));
+                    unregister_mods(mod_config(MOD_LALT));
                     unregister_code(KC_RIGHT);
                 }
             }
