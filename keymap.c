@@ -64,17 +64,17 @@ char layer_str[15];
 enum sofle_layers {
     _DEFAULTS = 0,
     _QWERTY   = 0,
-    _COLEMAK,
+    _GAMING,
     _COLEMAKDH,
     _LOWER,
     _RAISE,
     _ADJUST,
 };
 
-enum custom_keycodes { KC_LOWER = SAFE_RANGE, KC_RAISE, KC_ADJUST, KC_PRVWD, KC_NXTWD, KC_LSTRT, KC_LEND };
+enum custom_keycodes { KC_LOWER = SAFE_RANGE, KC_RAISE, KC_ADJUST, KC_PRVWD, KC_NXTWD};
 
 #define KC_QWERTY PDF(_QWERTY)
-#define KC_COLEMAK PDF(_COLEMAK)
+#define KC_GAMING PDF(_GAMING)
 #define KC_COLEMAKDH PDF(_COLEMAKDH)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -107,27 +107,32 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //            \--------+--------+--------+---------+-------|   |--------+---------+--------+---------+-------/
         ),
 
-    /*
-     * COLEMAK
+    /* GAMING (Removed the Windows key to avoid accidentally pressing it in game)
      * ,-----------------------------------------.                    ,-----------------------------------------.
      * |  `   |   1  |   2  |   3  |   4  |   5  |                    |   6  |   7  |   8  |   9  |   0  | ESC  |
      * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-     * | TAB  |   Q  |   W  |   F  |   P  |   G  |                    |   J  |   L  |   U  |   Y  |   ;  | Bspc |
+     * | TAB  |   Q  |   W  |   E  |   R  |   T  |                    |   Y  |   U  |   I  |   O  |   P  |  -   |
      * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-     * | Caps |   A  |   R  |   S  |   T  |   D  |-------.    ,-------|   H  |   N  |   E  |   I  |   O  |  '   |
-     * |------+------+------+------+------+------|  MUTE |    |       |------+------+------+------+------+------|
-     * | Shift|   Z  |   X  |   C  |   V  |   B  |-------|    |-------|   K  |   M  |   ,  |   .  |   /  | Shift|
+     * | Caps |   A  |   S  |   D  |   F  |   G  |-------.    ,-------|   H  |   J  |   K  |   L  |   ;  |  '   |
+     * |------+------+------+------+------+------| MUTE  |    |       |------+------+------+------+------+------|
+     * | Shift|   Z  |   X  |   C  |   V  |   B  |-------|    |-------|   N  |   M  |   ,  |   .  |   /  |RShift|
      * `-----------------------------------------/       /     \      \-----------------------------------------'
-     *            | RCTR | LGUI | LAlt |LOWER | / Space /       \ Enter\  |RAISE | Bspc | RAlt | RCTR |
+     *            | RCTR |      | LAlt |LOWER | / Space /       \ Enter\  |RAISE | Bspc | RAlt | RCTR |
      *            |      |      |      |      |/       /         \      \ |      |      |      |      |
      *            `----------------------------------'           '------''---------------------------'
      */
-    [_COLEMAK] = LAYOUT(
-        _______, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, _______,
-        _______, KC_Q, KC_W, KC_F, KC_P, KC_G, KC_J, KC_L, KC_U, KC_Y, KC_SCLN, _______,
-        _______, KC_A, KC_R, KC_S, KC_T, KC_D, KC_H, KC_N, KC_E, KC_I, KC_O, _______,
-        _______, KC_Z, KC_X, KC_C, KC_V, KC_B, _______, _______, KC_K, KC_M, KC_COMM, KC_DOT, KC_SLSH, _______,
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
+    [_GAMING] = LAYOUT(
+    //,------------------------------------------------.                    ,---------------------------------------------------.
+        KC_GRV, KC_1,   KC_2,   KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,   KC_8,    KC_9,    KC_0,    KC_ESC,
+    //|------+-------+--------+--------+--------+------|                   |--------+-------+--------+--------+--------+---------|
+        KC_TAB, KC_Q,   KC_W,   KC_E,    KC_R,    KC_T,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_MINUS,
+    //|------+-------+--------+--------+--------+------|                   |--------+-------+--------+--------+--------+---------|
+        KC_CAPS, KC_A, KC_S,    KC_D,    KC_F,    KC_G,                      KC_H,    KC_J,   KC_K,    KC_L,    KC_SCLN, KC_QUOT,
+    //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
+        KC_LSFT, KC_Z, KC_X,    KC_C,    KC_V,    KC_B,  KC_MUTE,   XXXXXXX, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
+    //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
+                    KC_LCTL, XXXXXXX, KC_LALT, KC_LOWER, KC_SPC,     KC_ENT, KC_RAISE, KC_BSPC, KC_RALT, KC_RCTL
+    //            \--------+--------+--------+---------+-------|   |--------+---------+--------+---------+-------/
         ),
 
     /*
@@ -155,11 +160,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     /* LOWER
      * ,-----------------------------------------.                    ,-----------------------------------------.
-     * |      |  F1  |  F2  |  F3  |  F4  |  F5  |                    |  F6  |  F7  |  F8  |  F9  | F10  | F11  |
+     * |  `   |  F1  |  F2  |  F3  |  F4  |  F5  |                    |  F6  |  F7  |  F8  |  F9  | F10  | F11  |
      * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-     * |  `   |   1  |   2  |   3  |   4  |   5  |                    |   6  |   7  |   8  |   9  |   0  | F12  |
+     * | Tab  |   1  |   2  |   3  |   4  |   5  |                    |   6  |   7  |   8  |   9  |   0  | F12  |
      * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-     * | Tab  |   !  |   @  |   #  |   $  |   %  |-------.    ,-------|   ^  |   &  |   *  |   (  |   )  |   |  |
+     * | Caps |   !  |   @  |   #  |   $  |   %  |-------.    ,-------|   ^  |   &  |   *  |   (  |   )  |   |  |
      * |------+------+------+------+------+------|  MUTE |    |       |------+------+------+------+------+------|
      * | Shift|  =   |  -   |  +   |   {  |   }  |-------|    |-------|   [  |   ]  |   ;  |   :  |   \  | Shift|
      * `-----------------------------------------/       /     \      \-----------------------------------------'
@@ -171,7 +176,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         //,------------------------------------------------.                    ,---------------------------------------------------.
         _______, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11,
         //|------+-------+--------+--------+--------+------|                   |--------+-------+--------+--------+--------+---------|
-        KC_GRV, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_F12,
+        _______, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_F12,
         //|------+-------+--------+--------+--------+------|                   |--------+-------+--------+--------+--------+---------|
         _______, KC_EXLM, KC_AT, KC_HASH, KC_DLR, KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_PIPE,
         //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
@@ -187,7 +192,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
      * | Esc  | Ins  | Pscr | Menu |      |      |                    |PageUp| PWrd |  Up  | NWrd | DLine| Bspc |
      * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-     * | Tab  | LAt  | LCtl | Shift|      | Caps |-------.    ,-------|PageDn| Left | Down | Rigth|  Del | Bspc |
+     * | Tab  |SelAll| Save |      |Ctrl+F| Caps |-------.    ,-------|PageDn| Left | Down | Rigth|  Del | Bspc |
      * |------+------+------+------+------+------|  MUTE  |   |       |------+------+------+------+------+------|
      * |Shift | Undo |  Cut | Copy | Paste|      |-------|    |-------|      | LStr |      | LEnd |      | Shift|
      * `-----------------------------------------/       /     \      \-----------------------------------------'
@@ -199,11 +204,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         //,------------------------------------------------.                    ,---------------------------------------------------.
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
         //|------+-------+--------+--------+--------+------|                   |--------+-------+--------+--------+--------+---------|
-        _______, KC_INS, KC_PSCR, KC_APP, XXXXXXX, XXXXXXX, KC_PGUP, KC_PRVWD, KC_UP, KC_NXTWD, C(KC_BSPC), KC_BSPC,
+        _______, KC_INS, KC_PSCR, KC_APP, XXXXXXX, XXXXXXX, KC_PGUP, KC_PRVWD, KC_UP, KC_NXTWD, XXXXXXX, C(KC_BSPC),
         //|------+-------+--------+--------+--------+------|                   |--------+-------+--------+--------+--------+---------|
-        _______, KC_LALT, KC_LCTL, KC_LSFT, XXXXXXX, KC_CAPS, KC_PGDN, KC_LEFT, KC_DOWN, KC_RGHT, KC_DEL, KC_BSPC,
+        _______, C(KC_A), C(KC_S), KC_LSFT, C(KC_F), KC_CAPS, KC_PGDN, KC_LEFT, KC_DOWN, KC_RGHT, XXXXXXX, KC_DEL,
         //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
-        _______, C(KC_Z), C(KC_X), C(KC_C), C(KC_V), XXXXXXX, _______, _______, XXXXXXX, KC_LSTRT, XXXXXXX, KC_LEND, XXXXXXX, _______,
+        _______, C(KC_Z), C(KC_X), C(KC_C), C(KC_V), XXXXXXX, _______, _______, XXXXXXX, KC_HOME, XXXXXXX, KC_END, XXXXXXX, _______,
         //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
         //            \--------+--------+--------+---------+-------|   |--------+---------+--------+---------+-------/
@@ -213,7 +218,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // ! Unforturnately snap window does not work in Mac OS
     /* ADJUST
      * ,-------------------------------------------.                   ,-----------------------------------------.
-     * |      |      |      |CLMKDH | CLMK  |QWERTY|                   |      |      |      |      |      |      |
+     * |      |      |      |CLMKDH |Gaming |QWERTY|                   |      |      |      |      |      |      |
      * |--------+------+------+------+------+------|                   |------+------+------+------+------+------|
      * | QK_BOOT|    |      |       |       |      |                   |      |      | MsUp |      |      |      |
      * |--------+------+------+------+------+------|                   |------+------+------+------+------+------|
@@ -227,7 +232,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      */
     [_ADJUST] = LAYOUT(
         //,------------------------------------------------.                    ,---------------------------------------------------.
-        EE_CLR, XXXXXXX, XXXXXXX, KC_COLEMAKDH, KC_COLEMAK, KC_QWERTY, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+        EE_CLR, XXXXXXX, XXXXXXX, KC_COLEMAKDH, KC_GAMING, KC_QWERTY, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
         //|------+-------+--------+--------+--------+------|                   |--------+-------+--------+--------+--------+---------|
         QK_BOOT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, MS_UP, XXXXXXX, XXXXXXX, XXXXXXX,
         //|------+-------+--------+--------+--------+------|                   |--------+-------+--------+--------+--------+---------|
@@ -266,9 +271,10 @@ uint8_t  current_idle_frame = 0;
 // uint8_t current_prep_frame = 0; // uncomment if PREP_FRAMES >1
 uint8_t current_tap_frame = 0;
 
-#define TAP_SPEED_STAGE1  50
-#define TAP_SPEED_STAGE2 70
-#define TAP_SPEED_STAGE3 100
+
+#define TAP_SPEED_STAGE1  45
+#define TAP_SPEED_STAGE2 65
+#define TAP_SPEED_STAGE3 85
 
 #define TAP_ANIM_DURATION_STAGE1 200
 #define TAP_ANIM_DURATION_STAGE2 120
@@ -318,21 +324,6 @@ static void render_anim(void) {
         anim_frame_duration = TAP_ANIM_DURATION_STAGE1;
     }
 
-    // assumes 1 frame prep stage
-    // void animation_phase(void) {
-    //     if (get_current_wpm() <= IDLE_SPEED) {
-    //         current_idle_frame = (current_idle_frame + 1) % IDLE_FRAMES;
-    //         oled_write_raw_P(idle[abs((IDLE_FRAMES - 1) - current_idle_frame)], ANIM_SIZE);
-    //     }
-    //     if (get_current_wpm() > IDLE_SPEED && get_current_wpm() < TAP_SPEED) {
-    //         // oled_write_raw_P(prep[abs((PREP_FRAMES-1)-current_prep_frame)], ANIM_SIZE); // uncomment if IDLE_FRAMES >1
-    //         oled_write_raw_P(prep[0], ANIM_SIZE); // remove if IDLE_FRAMES >1
-    //     }
-    //     if (get_current_wpm() >= TAP_SPEED) {
-    //         current_tap_frame = (current_tap_frame + 1) % TAP_FRAMES;
-    //         oled_write_raw_P(tap[abs((TAP_FRAMES - 1) - current_tap_frame)], ANIM_SIZE);
-    //     }
-    // }
     void animation_phase(void) {
         if (wpm <= IDLE_SPEED) {
             current_idle_frame = (current_idle_frame + 1) % IDLE_FRAMES;
@@ -394,7 +385,7 @@ bool oled_task_user(void) {
             case _QWERTY:
                 oled_write("QWERTY", false);
                 break;
-            case _COLEMAK:
+            case _GAMING:
                 oled_write("COLEMAK", false);
                 break;
             case _COLEMAKDH:
@@ -406,7 +397,7 @@ bool oled_task_user(void) {
 
         oled_set_cursor(0, 2);
         switch (get_highest_layer(layer_state)) {
-            case _COLEMAK:
+            case _GAMING:
             case _QWERTY:
             case _COLEMAKDH:
                 oled_write("Base", false);
@@ -515,22 +506,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             }
             break;
-        
-        case KC_LSTRT:  // Line Start
-            if (record->event.pressed) {
-                register_code(KC_HOME);
-            } else {
-                unregister_code(KC_HOME);
-            }
-            break;
-        
-        case KC_LEND:  // Line End
-            if (record->event.pressed) {
-                register_code(KC_END);
-            } else {
-                unregister_code(KC_END);
-            }
-            break;        
     }
     return true;
 }
@@ -543,7 +518,7 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
     // Main encoder has index of 0
     if (index == 0) {
         switch (get_highest_layer(layer_state)) {
-            case _COLEMAK:
+            case _GAMING:
             case _QWERTY:
             case _COLEMAKDH:
                 tap_code(clockwise ? QK_MOUSE_WHEEL_RIGHT : QK_MOUSE_WHEEL_LEFT);
