@@ -1,4 +1,4 @@
-![SofleKeyboard default keymap](https://imgur.com/a/D58cBo9)
+![SofleKeyboard default keymap](https://imgur.com/a/D58cBo9.png)
 ![SofleKeyboard adjust layer](https://i.imgur.com/f5sKy0I.png)
 
 # Default keymap for Sofle Keyboard
