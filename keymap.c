@@ -68,15 +68,16 @@ enum sofle_layers {
     _COLEMAKDH,
     _LOWER,
     _RAISE,
-    _ADJUST,
+    _MOUSE,
 };
 
-enum custom_keycodes { KC_LOWER = SAFE_RANGE, KC_RAISE, KC_ADJUST, KC_PRVWD, KC_NXTWD};
+enum custom_keycodes { KC_LOWER = SAFE_RANGE, KC_RAISE, KC_MOUSE, KC_PRVWD, KC_NXTWD};
 
 #define KC_QWERTY PDF(_QWERTY)
 #define KC_GAMING PDF(_GAMING)
 #define KC_CLMKDH PDF(_COLEMAKDH)
 
+// * You can find the keycodes here: https://docs.qmk.fm/keycodes_basic
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /*
      * QWERTY
@@ -172,9 +173,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * ,----------------------------------------.                     ,-----------------------------------------.
      * |      |      |      |      |      |      |                    |      |      |      |      |      |      |
      * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-     * | Esc  | Ins  | Pscr | Menu |      |      |                    |PageUp| PWrd |  Up  | NWrd | DLine| Bspc |
+     * | Tab  | Ins  | Pscr | Menu |      |      |                    |PageUp| PWrd |  Up  | NWrd |      | Del  |
      * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-     * | Tab  |SelAll| Save |      |Ctrl+F| Caps |-------.    ,-------|PageDn| Left | Down | Rigth|  Del | Bspc |
+     * | Caps |SelAll| Save |      |Ctrl+F| Caps |-------.    ,-------|PageDn| Left | Down | Rigth|      |      |
      * |------+------+------+------+------+------|  MUTE  |   |       |------+------+------+------+------+------|
      * |Shift | Undo |  Cut | Copy | Paste|      |-------|    |-------|      | LStr |      | LEnd |      | Shift|
      * `-----------------------------------------/       /     \      \-----------------------------------------'
@@ -184,37 +185,35 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      */
     [_RAISE] = LAYOUT(
         _______, _______, _______, _______, _______, _______,                        _______, _______,  _______, _______,  _______, _______,
-        _______, KC_INS,  KC_PSCR, KC_APP,  XXXXXXX, XXXXXXX,                        KC_PGUP, KC_PRVWD, KC_UP,   KC_NXTWD, XXXXXXX, C(KC_BSPC),
-        _______, C(KC_A), C(KC_S), KC_LSFT, C(KC_F), KC_CAPS,                        KC_PGDN, KC_LEFT,  KC_DOWN, KC_RGHT,  XXXXXXX, KC_DEL,
+        _______, KC_INS,  KC_PSCR, KC_APP,  XXXXXXX, XXXXXXX,                        KC_PGUP, KC_PRVWD, KC_UP,   KC_NXTWD, XXXXXXX, KC_DEL,
+        _______, C(KC_A), C(KC_S), KC_LSFT, C(KC_F), KC_CAPS,                        KC_PGDN, KC_LEFT,  KC_DOWN, KC_RGHT,  XXXXXXX, XXXXXXX,
         _______, C(KC_Z), C(KC_X), C(KC_C), C(KC_V), XXXXXXX, _______,      _______, XXXXXXX, KC_HOME,  XXXXXXX, KC_END,   XXXXXXX, _______,
                           _______, _______, _______, _______, _______,      _______, _______, _______, _______, _______
         ),
 
-    /* ADJUST
-     * ,-------------------------------------------.                   ,-----------------------------------------.
-     * |      |      |      |CLMKDH |Gaming |QWERTY|                   |      |      |      |      |      |      |
-     * |--------+------+------+------+------+------|                   |------+------+------+------+------+------|
-     * | QK_BOOT|    |      |       |       |      |                   |      |      | MsUp |      |      |      |
-     * |--------+------+------+------+------+------|                   |------+------+------+------+------+------|
-     * |      |      |      |MS_BTN1|MS_BTN2|      |-------.   ,-------|      |MsLeft|MsDown|MsRgth|      |      |
-     * |--------+------+------+------+------+------|  MUTE |   |       |------+------+------+------+------+------|
-     * |      |      |      |      |      |        |-------|   |-------|      | PREV | PLAY | NEXT |      |      |
+    /* MOUSE
+     * ,-----------------------------------------.                     ,-----------------------------------------.
+     * |      |CLMKDH|QWERTY|Gaming|      |      |                     |      |      |      |      |      |      |
+     * |------+------+------+------+------+------|                     |------+------+------+------+------+------|
+     * |      |      |      |MS_WHLL|MS_WHLR|MS_WHLU|                  |      |      | MsUp |      |      |      |
+     * |------+------+------+------+------+------|                     |------+------+------+------+------+------|
+     * |      |      |     |MS_BTN1|MS_BTN2|MS_WHLD|-------.   ,-------|      |MsLeft|MsDown|MsRgth|      |      |
+     * |------+------+------+------+------+------|  MUTE   |   |       |------+------+------+------+------+------|
+     * |      |      |     |MS_BT4 |MS_BT5|MS_BT3|---------|   |-------|      | PREV | PLAY | NEXT |      |      |
      * `-----------------------------------------/       /     \      \-----------------------------------------'
      *            | RCTR | LGUI | LAlt |LOWER | / Space /       \ Enter\  |RAISE | Bspc | RAlt | RCTR |
      *            |      |      |      |      |/       /         \      \ |      |      |      |      |
      *            `----------------------------------'           '------''---------------------------'
      */
-    [_ADJUST] = LAYOUT(
-        EE_CLR,  XXXXXXX, XXXXXXX, KC_CLMKDH, KC_GAMING, KC_QWERTY,                           XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-        QK_BOOT, XXXXXXX, XXXXXXX, XXXXXXX,   XXXXXXX,   XXXXXXX,                             XXXXXXX, XXXXXXX, MS_UP,   XXXXXXX, XXXXXXX, XXXXXXX,
-        XXXXXXX, XXXXXXX, XXXXXXX, MS_BTN1,   MS_BTN2,   XXXXXXX,                             XXXXXXX, MS_LEFT, MS_DOWN, MS_RGHT, XXXXXXX, XXXXXXX,
-        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,   XXXXXXX,   XXXXXXX,    XXXXXXX,        XXXXXXX, XXXXXXX, KC_MPRV, KC_MPLY, KC_MNXT, XXXXXXX, XXXXXXX,
+    [_MOUSE] = LAYOUT(
+        XXXXXXX, KC_CLMKDH, KC_QWERTY, KC_GAMING, XXXXXXX, XXXXXXX,                           XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+        XXXXXXX, XXXXXXX, XXXXXXX, MS_WHLL,   MS_WHLR,   MS_WHLU,                             XXXXXXX, XXXXXXX, MS_UP,   XXXXXXX, XXXXXXX, XXXXXXX,
+        XXXXXXX, XXXXXXX, XXXXXXX, MS_BTN1,   MS_BTN2,   MS_WHLD,                             XXXXXXX, MS_LEFT, MS_DOWN, MS_RGHT, XXXXXXX, XXXXXXX,
+        XXXXXXX, XXXXXXX, XXXXXXX, MS_BTN4,   MS_BTN5,   MS_BTN3,    XXXXXXX,        XXXXXXX, XXXXXXX, KC_MPRV, KC_MPLY, KC_MNXT, XXXXXXX, XXXXXXX,
                                  _______, _______, _______, _______, _______,        _______, _______, _______, _______, _______
         ),
 };
 
-// TODO create C array image for bongo cat
-// TODO learn how to animate bongo cat
 // * Yoinked bongo cat from https://github.com/nwii/oledbongocat/blob/main/keymap.c
 
 // #ifdef OLED
@@ -376,8 +375,8 @@ bool oled_task_user(void) {
             case _LOWER:
                 oled_write("Lower", false);
                 break;
-            case _ADJUST:
-                oled_write("Adjust", false);
+            case _MOUSE:
+                oled_write("Mouse", false);
                 break;
             default:
                 oled_write("Undef", false);
@@ -415,7 +414,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_off(_LOWER);
             }
             // Update adjust layer
-            update_tri_layer_now(_LOWER, _RAISE, _ADJUST);
+            update_tri_layer_now(_LOWER, _RAISE, _MOUSE);
             return false;
         case KC_RAISE:
             if (record->event.pressed) {
@@ -424,13 +423,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_off(_RAISE);
             }
             // Update adjust layer
-            update_tri_layer_now(_LOWER, _RAISE, _ADJUST);
+            update_tri_layer_now(_LOWER, _RAISE, _MOUSE);
             return false;
-        case KC_ADJUST:
+        case KC_MOUSE:
             if (record->event.pressed) {
-                layer_on(_ADJUST);
+                layer_on(_MOUSE);
             } else {
-                layer_off(_ADJUST);
+                layer_off(_MOUSE);
             }
             return false;
             case KC_PRVWD:  // Previous Word
@@ -483,7 +482,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 // ! volumne controls along with the functionality in this function.
 #ifdef ENCODER_ENABLE
 bool encoder_update_user(uint8_t index, bool clockwise) {
-    // Main encoder has index of 0
+    // Main/left side encoder encoder has index of 0.
     if (index == 0) {
         switch (get_highest_layer(layer_state)) {
             case _GAMING:
